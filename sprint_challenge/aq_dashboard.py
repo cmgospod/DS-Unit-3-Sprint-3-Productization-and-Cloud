@@ -8,6 +8,7 @@ APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 DB = SQLAlchemy(APP)
 
 class Record(DB.Model):
+    """Class for database records"""
     id = DB.Column(DB.Integer, primary_key=True)
     datetime = DB.Column(DB.String(25))
     value = DB.Column(DB.Float, nullable=False)
@@ -17,7 +18,7 @@ class Record(DB.Model):
 
 @APP.route('/')
 def root():
-    """Base view."""
+    """Base view. Initial code commented out for reference"""
     # api = openaq.OpenAQ()
     # status, body = api.measurements(city='Los Angeles', parameter='pm25')
     # return str(cleaner(body))
@@ -33,12 +34,6 @@ def root():
     pollution = Record.query.filter(Record.value > 10).all()
     return str(pollution)
 
-
-
-
-
-
-
 @APP.route('/refresh')
 def refresh():
     """Pull fresh data from Open AQ and replace existing data."""
@@ -48,8 +43,6 @@ def refresh():
     status, body = api.measurements(city='Los Angeles', parameter='pm25')
     reading_list = []
     for reading in body['results']:
-        # reading_list = [reading['date']['utc'], reading['value']]
-        # tup = tuple(reading_list)
         object = Record(datetime = reading['date']['utc'], value = reading['value'])
         DB.session.add(object)
     DB.session.commit()
